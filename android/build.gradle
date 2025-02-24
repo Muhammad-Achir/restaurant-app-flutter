@@ -1,0 +1,35 @@
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+
+rootProject.buildDir = "../build"
+subprojects {
+    project.buildDir = "${rootProject.buildDir}/${project.name}"
+}
+subprojects {
+    project.evaluationDependsOn(":app")
+}
+
+tasks.register("clean", Delete) {
+    delete rootProject.buildDir
+}
+
+// buildscript {
+//     ext.kotlin_version = '1.9.0'  // Versi terbaru Kotlin
+//     dependencies {
+//         classpath 'com.android.tools.build:gradle:8.1.1'  // Versi Gradle terbaru
+//     }
+// }
+
+tasks.register("startApi", Exec) {
+    workingDir rootProject.projectDir
+    def os = org.gradle.internal.os.OperatingSystem.current()
+    if (os.isWindows()) {
+        commandLine "powershell", "-Command", "Start-Process node -ArgumentList 'service' -WindowStyle Hidden"
+    } else {
+        commandLine "sh", "-c", "nohup node service >/dev/null 2>&1 &"
+    }
+}
